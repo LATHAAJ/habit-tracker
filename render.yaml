@@ -1,6 +1,7 @@
 databases:
   - name: habit-tracker-db
     plan: free
+    region: oregon
     databaseName: habit_tracker
     user: habit
 
@@ -9,6 +10,7 @@ services:
     name: habit-tracker
     runtime: docker
     plan: free
+    region: oregon
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:
