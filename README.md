@@ -11,7 +11,7 @@ Spring Boot application.
 - JWT auth (`jjwt`), BCrypt password hashing
 - Static HTML/CSS/vanilla JS frontend (`src/main/resources/static`) — no build step, served
   directly by Spring Boot so the whole app is one deployable unit
-- Maven, multi-stage Dockerfile
+- Gradle, multi-stage Dockerfile
 
 ## Running locally
 
@@ -19,7 +19,7 @@ Requires Docker (for a local Postgres) and a JDK 17+.
 
 ```bash
 docker compose up -d          # starts a local Postgres on localhost:5432
-mvn spring-boot:run           # starts the app on http://localhost:8080
+./gradlew bootRun             # starts the app on http://localhost:8080
 ```
 
 Open http://localhost:8080, sign up, and start tracking habits.
@@ -27,14 +27,14 @@ Open http://localhost:8080, sign up, and start tracking habits.
 To run against a different local Postgres, override the datasource properties, e.g.:
 
 ```bash
-mvn spring-boot:run \
-  -Dspring-boot.run.arguments="--spring.datasource.url=jdbc:postgresql://localhost:5432/habit_tracker --spring.datasource.username=habit --spring.datasource.password=habit"
+./gradlew bootRun \
+  --args="--spring.datasource.url=jdbc:postgresql://localhost:5432/habit_tracker --spring.datasource.username=habit --spring.datasource.password=habit"
 ```
 
 ## Running tests
 
 ```bash
-mvn test
+./gradlew test
 ```
 
 - `StreakCalculatorTest` — unit tests for the streak math (no completions, consecutive runs,

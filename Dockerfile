@@ -1,12 +1,13 @@
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /build
-COPY pom.xml .
-RUN mvn -q -B dependency:go-offline
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle settings.gradle .
 COPY src ./src
-RUN mvn -q -B -DskipTests package
+RUN ./gradlew -q -x test bootJar
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /build/target/habit-tracker-*.jar app.jar
+COPY --from=build /build/build/libs/habit-tracker-*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
