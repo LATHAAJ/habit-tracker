@@ -32,7 +32,7 @@
 
     const response = await fetch(path, Object.assign({}, options, { headers }));
 
-    if (response.status === 401) {
+    if (response.status === 401 && !options.skipSessionHandling) {
       clearSession();
       showAuthView();
       throw new Error("Session expired, please log in again");
@@ -85,6 +85,7 @@
     try {
       const data = await api("/api/auth/login", {
         method: "POST",
+        skipSessionHandling: true,
         body: JSON.stringify({
           email: form.email.value.trim(),
           password: form.password.value,
@@ -106,6 +107,7 @@
     try {
       const data = await api("/api/auth/signup", {
         method: "POST",
+        skipSessionHandling: true,
         body: JSON.stringify({
           email: form.email.value.trim(),
           password: form.password.value,
