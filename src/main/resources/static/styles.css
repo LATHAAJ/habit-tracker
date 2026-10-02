@@ -1,0 +1,320 @@
+:root {
+  --bg: #f5f6fb;
+  --surface: #ffffff;
+  --surface-alt: #f0f1f8;
+  --text: #1c1e2b;
+  --text-muted: #6b7086;
+  --border: #e3e5ef;
+  --accent: #6c5ce7;
+  --accent-strong: #5a4bd1;
+  --accent-soft: #efecfd;
+  --success: #ff8a3d;
+  --danger: #e0527a;
+  --shadow: 0 8px 24px rgba(28, 30, 43, 0.08);
+  --radius: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14151f;
+    --surface: #1c1e2b;
+    --surface-alt: #242637;
+    --text: #eceeff;
+    --text-muted: #9a9cb5;
+    --border: #2d2f42;
+    --accent: #8f7bff;
+    --accent-strong: #a393ff;
+    --accent-soft: #2a2550;
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14151f;
+  --surface: #1c1e2b;
+  --surface-alt: #242637;
+  --text: #eceeff;
+  --text-muted: #9a9cb5;
+  --border: #2d2f42;
+  --accent: #8f7bff;
+  --accent-strong: #a393ff;
+  --accent-soft: #2a2550;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f6fb;
+  --surface: #ffffff;
+  --surface-alt: #f0f1f8;
+  --text: #1c1e2b;
+  --text-muted: #6b7086;
+  --border: #e3e5ef;
+  --accent: #6c5ce7;
+  --accent-strong: #5a4bd1;
+  --accent-soft: #efecfd;
+  --shadow: 0 8px 24px rgba(28, 30, 43, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.brand-mark { font-size: 1.4rem; }
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+/* --- buttons & inputs --- */
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.btn-primary:hover { background: var(--accent-strong); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+.btn-toggle {
+  width: 100%;
+  margin-top: 1rem;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-toggle.done {
+  background: var(--success);
+  color: white;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+}
+.icon-btn:hover { color: var(--danger); background: var(--surface-alt); }
+
+input[type="email"], input[type="password"], input[type="text"] {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.9rem;
+}
+
+.hint { font-size: 0.75rem; color: var(--text-muted); }
+
+/* --- auth view --- */
+
+.auth-view {
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 0.25rem;
+}
+
+.auth-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  min-height: 1.1em;
+  margin: -0.4rem 0 0.6rem;
+}
+
+/* --- dashboard --- */
+
+.add-habit-card {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin: 2rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+.add-habit-card input[name="name"] { flex: 1 1 220px; }
+.add-habit-card input[name="description"] { flex: 1 1 220px; }
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem 1rem;
+}
+
+.habit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.habit-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.habit-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.habit-name {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.habit-description {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0.75rem;
+  min-height: 1.1em;
+}
+
+.streak-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.streak-badge {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.streak-number { font-weight: 700; font-size: 1rem; }
+.streak-label { color: var(--text-muted); font-size: 0.75rem; }
+
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+.heatmap .day {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+
+.heatmap .day.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .topbar { padding: 1rem; }
+  .habit-grid { grid-template-columns: 1fr; }
+}

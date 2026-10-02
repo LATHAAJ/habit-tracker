@@ -1,0 +1,38 @@
+databases:
+  - name: habit-tracker-db
+    plan: free
+    databaseName: habit_tracker
+    user: habit
+
+services:
+  - type: web
+    name: habit-tracker
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: habit-tracker-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: habit-tracker-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: habit-tracker-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: habit-tracker-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: habit-tracker-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_DAYS
+        value: "7"

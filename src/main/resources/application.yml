@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: habit-tracker
+  datasource:
+    # SPRING_DATASOURCE_URL wins if set; otherwise built from the individual DB_* parts
+    # (used on Render, where the free Postgres add-on exposes host/port/database separately).
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:habit_tracker}}
+    username: ${DB_USER:habit}
+    password: ${DB_PASSWORD:habit}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+server:
+  port: ${PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-local-secret-key-change-me-please-32bytes-min}
+    expiration-days: ${JWT_EXPIRATION_DAYS:7}
