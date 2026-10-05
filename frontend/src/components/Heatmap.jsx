@@ -4,7 +4,12 @@ import { api } from '../api.js';
 const HEATMAP_DAYS = 30;
 
 function toIsoDate(d) {
-  return d.toISOString().slice(0, 10);
+  // Local calendar date, not toISOString()'s UTC date - that silently shifts the date
+  // by a day for any timezone ahead of UTC once local midnight crosses into "yesterday UTC".
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export default function Heatmap({ habitId, refreshKey }) {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../api.js';
 import { categoryColor } from '../categories.js';
 import Heatmap from './Heatmap.jsx';
+import HabitDetailModal from './HabitDetailModal.jsx';
 
 function frequencyLabel(habit) {
   if (habit.frequencyType === 'WEEKLY') {
@@ -14,8 +15,10 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState('');
   const [celebrate, setCelebrate] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
-  async function handleToggle() {
+  async function handleToggle(e) {
+    e.stopPropagation();
     setError('');
     try {
       const updated = await api(`/api/habits/${habit.id}/toggle`, { method: 'POST' });
@@ -30,7 +33,8 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
     }
   }
 
-  async function handleDelete() {
+  async function handleDelete(e) {
+    e.stopPropagation();
     if (!window.confirm(`Delete "${habit.name}"? This removes all its history.`)) return;
     try {
       await api(`/api/habits/${habit.id}`, { method: 'DELETE' });
@@ -41,7 +45,12 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
   }
 
   return (
-    <article className={`habit-card ${habit.currentStreak > 0 ? 'on-streak' : ''}`}>
+    <article
+      className={`habit-card ${habit.currentStreak > 0 ? 'on-streak' : ''}`}
+      onClick={() => setShowDetail(true)}
+      role="button"
+      tabIndex={0}
+    >
       <div className="habit-card-header">
         <div>
           <h3 className="habit-name">{habit.name}</h3>
@@ -92,6 +101,8 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
           </span>
         )}
       </div>
+
+      {showDetail && <HabitDetailModal habit={habit} onClose={() => setShowDetail(false)} />}
     </article>
   );
 }

@@ -4,7 +4,11 @@ import TrendChart from './TrendChart.jsx';
 import BestWorstPanel from './BestWorstPanel.jsx';
 
 function toIsoDate(d) {
-  return d.toISOString().slice(0, 10);
+  // Local calendar date, not toISOString()'s UTC date - see Heatmap.jsx for why.
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export default function StatsView() {

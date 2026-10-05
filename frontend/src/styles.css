@@ -586,6 +586,7 @@ label {
   display: flex;
   flex-direction: column;
   border: 1px solid transparent;
+  cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .habit-card:hover {
@@ -806,4 +807,110 @@ label {
   .habit-grid { grid-template-columns: 1fr; }
   .rank-row { grid-template-columns: minmax(100px, 1fr) minmax(70px, 1.4fr) 2.5rem; }
   .summary-hero { flex-direction: column; align-items: stretch; }
+}
+
+/* --- habit detail modal --- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 20, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+  cursor: default;
+}
+
+.modal-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  cursor: default;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+.modal-header h3 { margin: 0; font-size: 1.1rem; }
+
+.consistency-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--cat-color, var(--accent)) 30%, var(--border));
+}
+.consistency-summary[data-color='red'] { --cat-color: var(--cat-red); }
+.consistency-summary[data-color='blue'] { --cat-color: var(--cat-blue); }
+.consistency-summary[data-color='aqua'] { --cat-color: var(--cat-aqua); }
+.consistency-summary[data-color='yellow'] { --cat-color: var(--cat-yellow); }
+.consistency-summary[data-color='green'] { --cat-color: var(--cat-green); }
+
+.consistency-emoji { font-size: 2rem; line-height: 1; }
+
+.consistency-label {
+  display: block;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--cat-color, var(--accent));
+}
+.consistency-value {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.week-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 48px;
+  align-items: center;
+  gap: 0.6rem;
+}
+.week-row.current-week .week-label { color: var(--accent); font-weight: 700; }
+
+.week-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.week-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+.week-bar-fill {
+  height: 100%;
+  background: var(--gradient-brand);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.week-count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
