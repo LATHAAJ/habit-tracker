@@ -1,9 +1,13 @@
 package com.habittracker.streak;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Pure, side-effect-free streak math over a set of completion dates.
@@ -52,5 +56,68 @@ public class StreakCalculator {
         }
 
         return new StreakResult(current, longest);
+    }
+
+    /**
+     * Frequency-aware streak calculation. DAILY delegates to the consecutive-day
+     * logic above; WEEKLY buckets completions by calendar week and runs the same
+     * consecutive-run logic over weeks that met the target count.
+     */
+    public static StreakResult calculate(Set<LocalDate> completedDates, LocalDate today,
+                                          Frequency frequency, int targetPerPeriod) {
+        if (frequency == Frequency.DAILY) {
+            return calculate(completedDates, today);
+        }
+        return calculateWeekly(completedDates, today, targetPerPeriod);
+    }
+
+    private static LocalDate weekStart(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    private static StreakResult calculateWeekly(Set<LocalDate> completedDates, LocalDate today, int targetPerPeriod) {
+        if (completedDates.isEmpty()) {
+            return new StreakResult(0, 0);
+        }
+
+        Map<LocalDate, Long> countsByWeek = completedDates.stream()
+                .collect(Collectors.groupingBy(StreakCalculator::weekStart, Collectors.counting()));
+
+        LocalDate firstWeek = countsByWeek.keySet().stream().min(LocalDate::compareTo).orElseThrow();
+        LocalDate currentWeek = weekStart(today);
+
+        List<Boolean> met = new ArrayList<>();
+        for (LocalDate week = firstWeek; !week.isAfter(currentWeek); week = week.plusWeeks(1)) {
+            met.add(countsByWeek.getOrDefault(week, 0L) >= targetPerPeriod);
+        }
+
+        int longest = 0;
+        int run = 0;
+        for (boolean weekMet : met) {
+            run = weekMet ? run + 1 : 0;
+            longest = Math.max(longest, run);
+        }
+
+        int lastIndex = met.size() - 1;
+        int current;
+        if (met.get(lastIndex)) {
+            current = trailingRun(met, lastIndex);
+        } else if (lastIndex >= 1 && met.get(lastIndex - 1)) {
+            // Current week hasn't met target yet, but it isn't over — streak still alive
+            // from last week, same idea as "today not marked but yesterday was" above.
+            current = trailingRun(met, lastIndex - 1);
+        } else {
+            current = 0;
+        }
+
+        return new StreakResult(current, longest);
+    }
+
+    private static int trailingRun(List<Boolean> met, int fromIndexInclusive) {
+        int run = 0;
+        for (int i = fromIndexInclusive; i >= 0 && met.get(i); i--) {
+            run++;
+        }
+        return run;
     }
 }

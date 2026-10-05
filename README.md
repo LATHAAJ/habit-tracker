@@ -1,16 +1,17 @@
 # Habit Tracker
 
-A habit tracker with per-day completion tracking, streak math (current + longest streak),
-multi-user accounts (signup/login via JWT), and a built-in web UI — all served by a single
-Spring Boot application.
+A habit tracker with per-day completion tracking, streak math (current + longest streak,
+daily or custom weekly frequency), categories, weekly/monthly stats, multi-user accounts
+(signup/login via JWT), and a React web UI — all served by a single Spring Boot application.
 
 ## Stack
 
 - Java 17, Spring Boot 3 (Web, Security, Data JPA, Validation)
 - PostgreSQL (production), H2 in-memory (tests only)
 - JWT auth (`jjwt`), BCrypt password hashing
-- Static HTML/CSS/vanilla JS frontend (`src/main/resources/static`) — no build step, served
-  directly by Spring Boot so the whole app is one deployable unit
+- React + Vite frontend (`frontend/`), built by Gradle (`com.github.node-gradle.node`
+  plugin) into the Spring Boot jar's static resources — still one deployable unit, no
+  separate frontend server/deploy, no manual `npm` step for `./gradlew bootRun`/`bootJar`
 - Gradle, multi-stage Dockerfile
 
 ## Running locally
@@ -37,27 +38,34 @@ To run against a different local Postgres, override the datasource properties, e
 ./gradlew test
 ```
 
-- `StreakCalculatorTest` — unit tests for the streak math (no completions, consecutive runs,
-  broken streaks, "today not yet marked but yesterday was", month/year boundaries).
+- `StreakCalculatorTest` — unit tests for daily and weekly-frequency streak math (no
+  completions, consecutive runs, broken streaks, "today/this week not yet marked but
+  the prior period was", month/year boundaries).
 - `JwtServiceTest` — token generation/validation, tampering, expiry.
 - `HabitControllerIntegrationTest` — full HTTP + security + JPA stack via MockMvc and an
   in-memory H2 database (`test` profile): signup → login → create → toggle → streak reflected
-  in the list, plus ownership isolation between users.
+  in the list, category filtering, weekly-frequency validation, ownership isolation between
+  users.
+- `StatsControllerIntegrationTest` — trend and best/worst-habit ranking endpoints, invalid
+  range handling, per-user scoping.
 
 ## API
 
-All `/api/habits/**` routes require `Authorization: Bearer <token>` from signup/login.
+All `/api/habits/**` and `/api/stats/**` routes require `Authorization: Bearer <token>`
+from signup/login.
 
 | Method | Path                          | Description                                  |
 |--------|-------------------------------|-----------------------------------------------|
 | POST   | `/api/auth/signup`            | Create an account, returns a JWT             |
 | POST   | `/api/auth/login`              | Log in, returns a JWT                        |
-| GET    | `/api/habits`                  | List your habits with streak info            |
-| POST   | `/api/habits`                  | Create a habit `{name, description}`         |
+| GET    | `/api/habits?category=`        | List your habits with streak info, optionally filtered by category |
+| POST   | `/api/habits`                  | Create a habit `{name, description?, category?, frequencyType?, targetPerPeriod?}` |
 | PUT    | `/api/habits/{id}`             | Update a habit                               |
 | DELETE | `/api/habits/{id}`             | Delete a habit (and its history)             |
 | POST   | `/api/habits/{id}/toggle?date=`| Toggle completion for a date (default today) |
 | GET    | `/api/habits/{id}/logs?from=&to=` | Completed dates in a range (ISO strings) |
+| GET    | `/api/stats/trend?granularity=&periods=` | Weekly/monthly completion-rate trend |
+| GET    | `/api/stats/habits?from=&to=`  | Habits ranked by completion rate, best first |
 | GET    | `/api/health`                  | Unauthenticated health check                 |
 
 ## Deploying to Render

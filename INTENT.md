@@ -22,8 +22,11 @@ backed by Postgres.
 ## Non-goals
 
 - No multi-tenant/team features, no habit sharing, no notifications/reminders.
-- No SPA framework or separate frontend build — static HTML/CSS/vanilla JS only.
-- No mobile app.
+- No mobile app, no separate frontend service — the React frontend is built by
+  Gradle (via the node-gradle plugin) and still ships embedded in the same
+  Spring Boot jar, so the one-deployable-unit goal above is unchanged.
+- No pagination or caching layer — list/stats endpoints assume a single user's
+  data is small enough to aggregate in memory on each request.
 
 ## Guiding principle
 

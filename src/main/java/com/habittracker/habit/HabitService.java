@@ -4,6 +4,7 @@ import com.habittracker.habit.dto.HabitRequest;
 import com.habittracker.habit.dto.HabitResponse;
 import com.habittracker.log.HabitLog;
 import com.habittracker.log.HabitLogRepository;
+import com.habittracker.streak.Frequency;
 import com.habittracker.streak.StreakCalculator;
 import com.habittracker.user.User;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,11 @@ public class HabitService {
     }
 
     @Transactional(readOnly = true)
-    public List<HabitResponse> listHabits(User owner) {
-        return habitRepository.findByOwnerIdOrderByCreatedAtAsc(owner.getId()).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<HabitResponse> listHabits(User owner, String category) {
+        List<Habit> habits = (category == null || category.isBlank())
+                ? habitRepository.findByOwnerIdOrderByCreatedAtAsc(owner.getId())
+                : habitRepository.findByOwnerIdAndCategoryOrderByCreatedAtAsc(owner.getId(), category);
+        return habits.stream().map(this::toResponse).toList();
     }
 
     @Transactional
@@ -38,6 +40,7 @@ public class HabitService {
         if (request.active() != null) {
             habit.setActive(request.active());
         }
+        applyFrequency(habit, request);
         habitRepository.save(habit);
         return toResponse(habit);
     }
@@ -50,6 +53,7 @@ public class HabitService {
         if (request.active() != null) {
             habit.setActive(request.active());
         }
+        applyFrequency(habit, request);
         habitRepository.save(habit);
         return toResponse(habit);
     }
@@ -81,6 +85,21 @@ public class HabitService {
                 .toList();
     }
 
+    private void applyFrequency(Habit habit, HabitRequest request) {
+        Frequency frequency = request.frequencyType() != null ? request.frequencyType() : Frequency.DAILY;
+        if (frequency == Frequency.WEEKLY) {
+            int target = request.targetPerPeriod() != null ? request.targetPerPeriod() : 0;
+            if (target < 1 || target > 7) {
+                throw new InvalidFrequencyException("targetPerPeriod must be between 1 and 7 for WEEKLY habits");
+            }
+            habit.setTargetPerPeriod(target);
+        } else {
+            habit.setTargetPerPeriod(null);
+        }
+        habit.setFrequencyType(frequency);
+        habit.setCategory(request.category() != null ? request.category().trim() : null);
+    }
+
     private Habit getOwnedHabit(User owner, Long habitId) {
         return habitRepository.findByIdAndOwnerId(habitId, owner.getId())
                 .orElseThrow(() -> new HabitNotFoundException(habitId));
@@ -91,7 +110,9 @@ public class HabitService {
                 .map(HabitLog::getDate)
                 .collect(Collectors.toSet());
         LocalDate today = LocalDate.now();
-        StreakCalculator.StreakResult streak = StreakCalculator.calculate(completedDates, today);
+        Frequency frequency = habit.getFrequencyType() != null ? habit.getFrequencyType() : Frequency.DAILY;
+        int target = habit.getTargetPerPeriod() != null ? habit.getTargetPerPeriod() : 1;
+        StreakCalculator.StreakResult streak = StreakCalculator.calculate(completedDates, today, frequency, target);
         return new HabitResponse(
                 habit.getId(),
                 habit.getName(),
@@ -100,7 +121,10 @@ public class HabitService {
                 habit.getCreatedAt(),
                 streak.currentStreak(),
                 streak.longestStreak(),
-                completedDates.contains(today)
+                completedDates.contains(today),
+                habit.getCategory(),
+                frequency,
+                target
         );
     }
 }

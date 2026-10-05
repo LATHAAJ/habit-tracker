@@ -3,6 +3,8 @@ package com.habittracker.config;
 import com.habittracker.auth.EmailAlreadyInUseException;
 import com.habittracker.auth.InvalidCredentialsException;
 import com.habittracker.habit.HabitNotFoundException;
+import com.habittracker.habit.InvalidFrequencyException;
+import com.habittracker.stats.InvalidStatsRangeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +31,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HabitNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleHabitNotFound(HabitNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidFrequencyException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidFrequency(InvalidFrequencyException ex) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidStatsRangeException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidStatsRange(InvalidStatsRangeException ex) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

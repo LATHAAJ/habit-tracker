@@ -1,5 +1,7 @@
 package com.habittracker.habit.dto;
 
+import com.habittracker.streak.Frequency;
+
 import java.time.Instant;
 
 public record HabitResponse(
@@ -10,6 +12,9 @@ public record HabitResponse(
         Instant createdAt,
         int currentStreak,
         int longestStreak,
-        boolean completedToday
+        boolean completedToday,
+        String category,
+        Frequency frequencyType,
+        int targetPerPeriod
 ) {
 }

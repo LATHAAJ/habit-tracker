@@ -6,6 +6,7 @@ import com.habittracker.auth.dto.LoginRequest;
 import com.habittracker.auth.dto.SignupRequest;
 import com.habittracker.habit.dto.HabitRequest;
 import com.habittracker.habit.dto.HabitResponse;
+import com.habittracker.streak.Frequency;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -65,7 +66,7 @@ class HabitControllerIntegrationTest {
         MvcResult createResult = mockMvc.perform(post("/api/habits")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new HabitRequest("Drink water", "8 glasses a day", null))))
+                        .content(objectMapper.writeValueAsString(new HabitRequest("Drink water", "8 glasses a day", null, null, null, null))))
                 .andExpect(status().isCreated())
                 .andReturn();
         HabitResponse created = readHabit(createResult);
@@ -105,7 +106,7 @@ class HabitControllerIntegrationTest {
         MvcResult createResult = mockMvc.perform(post("/api/habits")
                         .header("Authorization", "Bearer " + tokenA)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new HabitRequest("A's secret habit", null, null))))
+                        .content(objectMapper.writeValueAsString(new HabitRequest("A's secret habit", null, null, null, null, null))))
                 .andExpect(status().isCreated())
                 .andReturn();
         Long habitId = readHabit(createResult).id();
@@ -119,7 +120,7 @@ class HabitControllerIntegrationTest {
         mockMvc.perform(put("/api/habits/" + habitId)
                         .header("Authorization", "Bearer " + tokenB)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new HabitRequest("hijacked", null, null))))
+                        .content(objectMapper.writeValueAsString(new HabitRequest("hijacked", null, null, null, null, null))))
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(delete("/api/habits/" + habitId).header("Authorization", "Bearer " + tokenB))
@@ -144,5 +145,86 @@ class HabitControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new LoginRequest(email, "wrong-password"))))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void creatingHabitWithCategoryAndWeeklyFrequency_roundTripsInResponse() throws Exception {
+        String token = signup("weekly-" + UUID.randomUUID() + "@example.com");
+
+        MvcResult createResult = mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Gym", "Strength training", null, "Fitness", Frequency.WEEKLY, 3))))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        HabitResponse created = readHabit(createResult);
+        assertThat(created.category()).isEqualTo("Fitness");
+        assertThat(created.frequencyType()).isEqualTo(Frequency.WEEKLY);
+        assertThat(created.targetPerPeriod()).isEqualTo(3);
+    }
+
+    @Test
+    void weeklyHabitWithInvalidTarget_isRejected() throws Exception {
+        String token = signup("invalid-target-" + UUID.randomUUID() + "@example.com");
+
+        mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Gym", null, null, null, Frequency.WEEKLY, 8))))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Gym", null, null, null, Frequency.WEEKLY, 0))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void categoryFilter_onlyReturnsMatchingHabits() throws Exception {
+        String token = signup("category-" + UUID.randomUUID() + "@example.com");
+
+        mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Read", null, null, "Learning", null, null))))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Run", null, null, "Fitness", null, null))))
+                .andExpect(status().isCreated());
+
+        MvcResult filtered = mockMvc.perform(get("/api/habits?category=Fitness")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+        HabitResponse[] filteredList = objectMapper.readValue(filtered.getResponse().getContentAsString(), HabitResponse[].class);
+        assertThat(filteredList).hasSize(1);
+        assertThat(filteredList[0].name()).isEqualTo("Run");
+    }
+
+    @Test
+    void existingHabitWithNoCategoryOrFrequency_defaultsGracefully() throws Exception {
+        String token = signup("legacy-" + UUID.randomUUID() + "@example.com");
+
+        MvcResult createResult = mockMvc.perform(post("/api/habits")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new HabitRequest("Legacy habit", null, null, null, null, null))))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        HabitResponse created = readHabit(createResult);
+        assertThat(created.category()).isNull();
+        assertThat(created.frequencyType()).isEqualTo(Frequency.DAILY);
+        assertThat(created.targetPerPeriod()).isEqualTo(1);
     }
 }

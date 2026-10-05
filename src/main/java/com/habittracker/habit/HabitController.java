@@ -24,8 +24,8 @@ public class HabitController {
     }
 
     @GetMapping
-    public List<HabitResponse> list(@AuthenticationPrincipal User owner) {
-        return habitService.listHabits(owner);
+    public List<HabitResponse> list(@AuthenticationPrincipal User owner, @RequestParam(required = false) String category) {
+        return habitService.listHabits(owner, category);
     }
 
     @PostMapping

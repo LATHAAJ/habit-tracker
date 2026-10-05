@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'com.github.node-gradle.node' version '7.1.0'
 }
 
 group = 'com.habittracker'
@@ -43,4 +44,31 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+node {
+	version = '20.17.0'
+	download = true
+	nodeProjectDir = file('frontend')
+}
+
+tasks.register('buildFrontend', com.github.gradle.node.npm.task.NpmTask) {
+	dependsOn tasks.named('npmInstall')
+	args = ['run', 'build']
+	inputs.dir('frontend/src')
+	inputs.file('frontend/package.json')
+	inputs.file('frontend/vite.config.js')
+	outputs.dir(layout.buildDirectory.dir('generated-resources'))
+}
+
+sourceSets {
+	main {
+		resources {
+			srcDir(layout.buildDirectory.dir('generated-resources'))
+		}
+	}
+}
+
+tasks.named('processResources') {
+	dependsOn('buildFrontend')
 }

@@ -1,5 +1,6 @@
 package com.habittracker.habit;
 
+import com.habittracker.streak.Frequency;
 import com.habittracker.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,6 +34,14 @@ public class Habit {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @Column(length = 60)
+    private String category;
+
+    @Enumerated(EnumType.STRING)
+    private Frequency frequencyType;
+
+    private Integer targetPerPeriod;
 
     public Habit(String name, String description, User owner) {
         this.name = name;
