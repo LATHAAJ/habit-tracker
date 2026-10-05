@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "Habit Tracker API",
+    "description": "Full API surface for the Habit Tracker app. Run Signup or Login first - both auto-save the returned JWT into the {{token}} collection variable, which every other request uses automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "habitId", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Demo User\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('token', body.token);",
+                  "    console.log('Saved token for', body.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('token', body.token);",
+                  "    console.log('Saved token for', body.email);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Habits",
+      "item": [
+        {
+          "name": "List habits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/habits?category=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habits"],
+              "query": [{ "key": "category", "value": "", "description": "optional, e.g. 💪 Health" }]
+            }
+          }
+        },
+        {
+          "name": "Create habit (daily)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drink water\",\n  \"description\": \"8 glasses a day\",\n  \"category\": \"💪 Health\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('habitId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create habit (weekly)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym\",\n  \"description\": \"Strength training\",\n  \"category\": \"💪 Health\",\n  \"frequencyType\": \"WEEKLY\",\n  \"targetPerPeriod\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Update habit",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/habits/{{habitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Drink water\",\n  \"description\": \"10 glasses a day\",\n  \"category\": \"💪 Health\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Toggle completion (today)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/habits/{{habitId}}/toggle"
+          }
+        },
+        {
+          "name": "Toggle completion (specific date)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/habits/{{habitId}}/toggle?date=2026-10-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habits", "{{habitId}}", "toggle"],
+              "query": [{ "key": "date", "value": "2026-10-01" }]
+            }
+          }
+        },
+        {
+          "name": "Get completion logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/habits/{{habitId}}/logs?from=2026-09-01&to=2026-10-05",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habits", "{{habitId}}", "logs"],
+              "query": [
+                { "key": "from", "value": "2026-09-01" },
+                { "key": "to", "value": "2026-10-05" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete habit",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/habits/{{habitId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stats",
+      "item": [
+        {
+          "name": "Weekly trend",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/trend?granularity=WEEK&periods=12",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats", "trend"],
+              "query": [
+                { "key": "granularity", "value": "WEEK" },
+                { "key": "periods", "value": "12" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Monthly trend",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/trend?granularity=MONTH&periods=6",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats", "trend"],
+              "query": [
+                { "key": "granularity", "value": "MONTH" },
+                { "key": "periods", "value": "6" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Habit ranking (best/worst)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/habits?from=2026-09-01&to=2026-10-05",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats", "habits"],
+              "query": [
+                { "key": "from", "value": "2026-09-01" },
+                { "key": "to", "value": "2026-10-05" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    }
+  ]
+}
