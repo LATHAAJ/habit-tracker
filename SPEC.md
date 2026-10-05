@@ -48,6 +48,22 @@ changes; it should always match `src/main/java` exactly.
   so habits of different frequencies compare fairly.
 - Invalid `granularity`, out-of-range `periods`, or `from > to` → `400`.
 
+## AI habit plan (`/api/ai`, requires auth)
+
+| Endpoint | Method | Body | Notes |
+|---|---|---|---|
+| `/habit-plan` | POST | `{ goal }` (1..300 chars) | Returns `{ goalSummary, habits: [{name, description?, category, frequencyType, targetPerPeriod?}] }` |
+
+- Calls Google's Gemini API (`GEMINI_API_KEY` env var; model configurable via
+  `GEMINI_MODEL`, default `gemini-2.0-flash-lite`) — not Anthropic — chosen specifically
+  for its no-cost free tier.
+- `category` in the response is one of `HEALTH|LEARNING|CAREER|MIND|PERSONAL|FINANCE`
+  (maps to the frontend's fixed category list).
+- Returns `503` if `GEMINI_API_KEY` is unset; `502` if the upstream call fails or
+  returns an unusable response.
+- This endpoint only *suggests* habits — nothing is persisted. The client creates
+  habits the user selects via the normal `POST /api/habits`.
+
 ## Streak calculation (`StreakCalculator`, pure function)
 
 Input: a `Set<LocalDate>` of completed dates + "today" (+ frequency + target for
