@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api.js';
 import { categoryColor } from '../categories.js';
+import EditHabitModal from './EditHabitModal.jsx';
 import Heatmap from './Heatmap.jsx';
 import HabitDetailModal from './HabitDetailModal.jsx';
 
@@ -16,6 +17,7 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
   const [error, setError] = useState('');
   const [celebrate, setCelebrate] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   async function handleToggle(e) {
     e.stopPropagation();
@@ -63,9 +65,22 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
             <span className="tag tag-muted">{frequencyLabel(habit)}</span>
           </div>
         </div>
-        <button className="icon-btn delete-btn" title="Delete habit" aria-label="Delete habit" onClick={handleDelete}>
-          &times;
-        </button>
+        <div className="habit-card-actions">
+          <button
+            className="icon-btn edit-btn"
+            title="Edit habit"
+            aria-label="Edit habit"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowEdit(true);
+            }}
+          >
+            ✏️
+          </button>
+          <button className="icon-btn delete-btn" title="Delete habit" aria-label="Delete habit" onClick={handleDelete}>
+            &times;
+          </button>
+        </div>
       </div>
 
       {habit.description && <p className="habit-description">{habit.description}</p>}
@@ -103,6 +118,16 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
       </div>
 
       {showDetail && <HabitDetailModal habit={habit} onClose={() => setShowDetail(false)} />}
+      {showEdit && (
+        <EditHabitModal
+          habit={habit}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => {
+            onChanged(updated);
+            setShowEdit(false);
+          }}
+        />
+      )}
     </article>
   );
 }
