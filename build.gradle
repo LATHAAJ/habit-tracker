@@ -47,8 +47,9 @@ tasks.named('test') {
 }
 
 node {
-	version = '20.17.0'
-	download = true
+	// Use the system-installed Node (apk-installed in the Dockerfile's build stage, musl-built)
+	// instead of downloading nodejs.org's glibc binaries, which don't run on Alpine.
+	download = false
 	nodeProjectDir = file('frontend')
 }
 

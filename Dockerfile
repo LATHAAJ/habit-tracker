@@ -1,5 +1,6 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /build
+RUN apk add --no-cache nodejs npm
 COPY gradlew .
 COPY gradle ./gradle
 COPY build.gradle settings.gradle .
