@@ -48,7 +48,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-view">
-      <AddHabitForm categories={categories} onCreated={loadHabits} />
+      <AddHabitForm onCreated={loadHabits} />
 
       <CategoryFilter categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 

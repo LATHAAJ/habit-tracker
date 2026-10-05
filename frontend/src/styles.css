@@ -185,7 +185,7 @@ main {
 }
 .icon-btn:hover { color: var(--danger); background: var(--surface-alt); }
 
-input[type='email'], input[type='password'], input[type='text'], input[type='number'] {
+input[type='email'], input[type='password'], input[type='text'], input[type='number'], select {
   width: 100%;
   padding: 0.65rem 0.8rem;
   border-radius: 10px;
@@ -195,7 +195,7 @@ input[type='email'], input[type='password'], input[type='text'], input[type='num
   font-size: 0.95rem;
   font-family: inherit;
 }
-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 label {
   display: flex;
@@ -329,7 +329,7 @@ label {
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
 }
-.add-habit-details input { flex: 1 1 200px; }
+.add-habit-details input, .add-habit-details select { flex: 1 1 200px; }
 
 .frequency-picker {
   display: flex;

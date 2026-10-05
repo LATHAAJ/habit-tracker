@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
+import { CATEGORIES } from '../categories.js';
 import FrequencyPicker from './FrequencyPicker.jsx';
 
 const initialState = {
@@ -10,7 +11,7 @@ const initialState = {
   targetPerPeriod: 1,
 };
 
-export default function AddHabitForm({ categories, onCreated }) {
+export default function AddHabitForm({ onCreated }) {
   const [form, setForm] = useState(initialState);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState('');
@@ -24,7 +25,7 @@ export default function AddHabitForm({ categories, onCreated }) {
         body: JSON.stringify({
           name: form.name.trim(),
           description: form.description.trim(),
-          category: form.category.trim() || null,
+          category: form.category || null,
           frequencyType: form.frequencyType,
           targetPerPeriod: form.frequencyType === 'WEEKLY' ? form.targetPerPeriod : null,
         }),
@@ -42,7 +43,7 @@ export default function AddHabitForm({ categories, onCreated }) {
       <div className="add-habit-row">
         <input
           type="text"
-          placeholder="New habit, e.g. Drink water"
+          placeholder="New habit, e.g. Exercise"
           required
           maxLength={120}
           value={form.name}
@@ -63,19 +64,14 @@ export default function AddHabitForm({ categories, onCreated }) {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
-          <input
-            type="text"
-            placeholder="Category (optional)"
-            maxLength={60}
-            list="category-suggestions"
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-          />
-          <datalist id="category-suggestions">
-            {categories.map((c) => (
-              <option key={c} value={c} />
+          <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+            <option value="">No category</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
-          </datalist>
+          </select>
           <FrequencyPicker
             frequencyType={form.frequencyType}
             targetPerPeriod={form.targetPerPeriod}
