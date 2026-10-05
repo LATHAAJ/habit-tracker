@@ -4,13 +4,15 @@ import { useAuth } from '../AuthContext.jsx';
 export default function AuthView() {
   const [tabName, setTabName] = useState('login');
   const [error, setError] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const auth = useAuth();
 
-  function switchTab(name) {
-    setTabName(name);
+  function switchTab(tab) {
+    setTabName(tab);
     setError('');
+    setName('');
     setEmail('');
     setPassword('');
   }
@@ -22,7 +24,7 @@ export default function AuthView() {
       if (tabName === 'login') {
         await auth.login(email.trim(), password);
       } else {
-        await auth.signup(email.trim(), password);
+        await auth.signup(email.trim(), password, name.trim());
       }
     } catch (err) {
       setError(err.message);
@@ -53,6 +55,19 @@ export default function AuthView() {
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
+        {tabName === 'signup' && (
+          <label>
+            Name
+            <input
+              type="text"
+              required
+              maxLength={100}
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </label>
+        )}
         <label>
           Email
           <input

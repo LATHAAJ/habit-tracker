@@ -28,9 +28,9 @@ public class AuthService {
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyInUseException(email);
         }
-        User user = new User(email, passwordEncoder.encode(request.password()));
+        User user = new User(email, passwordEncoder.encode(request.password()), request.name().trim());
         userRepository.save(user);
-        return new AuthResponse(jwtService.generateToken(user.getEmail()), user.getEmail());
+        return new AuthResponse(jwtService.generateToken(user.getEmail()), user.getEmail(), user.getName());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -40,6 +40,6 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new InvalidCredentialsException();
         }
-        return new AuthResponse(jwtService.generateToken(user.getEmail()), user.getEmail());
+        return new AuthResponse(jwtService.generateToken(user.getEmail()), user.getEmail(), user.getName());
     }
 }

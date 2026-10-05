@@ -24,11 +24,14 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
+    private String name;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
-    public User(String email, String passwordHash) {
+    public User(String email, String passwordHash, String name) {
         this.email = email;
         this.passwordHash = passwordHash;
+        this.name = name;
     }
 }

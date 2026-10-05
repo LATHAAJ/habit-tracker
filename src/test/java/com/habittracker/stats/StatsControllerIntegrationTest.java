@@ -38,7 +38,7 @@ class StatsControllerIntegrationTest {
     private String signup(String email) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new SignupRequest(email, "password123"))))
+                        .content(objectMapper.writeValueAsString(new SignupRequest(email, "password123", "Test User"))))
                 .andExpect(status().isCreated())
                 .andReturn();
         return objectMapper.readValue(result.getResponse().getContentAsString(), AuthResponse.class).token();

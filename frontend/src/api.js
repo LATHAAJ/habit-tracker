@@ -1,5 +1,6 @@
 const TOKEN_KEY = 'habit_tracker_token';
 const EMAIL_KEY = 'habit_tracker_email';
+const NAME_KEY = 'habit_tracker_name';
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -9,14 +10,24 @@ export function getStoredEmail() {
   return localStorage.getItem(EMAIL_KEY);
 }
 
-export function setSession(token, email) {
+export function getStoredName() {
+  return localStorage.getItem(NAME_KEY);
+}
+
+export function setSession(token, email, name) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(EMAIL_KEY, email);
+  if (name) {
+    localStorage.setItem(NAME_KEY, name);
+  } else {
+    localStorage.removeItem(NAME_KEY);
+  }
 }
 
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(EMAIL_KEY);
+  localStorage.removeItem(NAME_KEY);
 }
 
 // Set by AuthContext so a 401 can clear app state without this module touching the DOM directly.

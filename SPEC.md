@@ -7,10 +7,13 @@ changes; it should always match `src/main/java` exactly.
 
 | Endpoint | Method | Body | Response | Notes |
 |---|---|---|---|---|
-| `/signup` | POST | `{ email, password }` | `201` + `{ token, email }` | Fails if email already in use |
-| `/login` | POST | `{ email, password }` | `200` + `{ token, email }` | Fails on bad credentials |
+| `/signup` | POST | `{ email, password, name }` | `201` + `{ token, email, name }` | Fails if email already in use |
+| `/login` | POST | `{ email, password }` | `200` + `{ token, email, name }` | Fails on bad credentials |
 
 - Passwords are BCrypt-hashed, never stored or returned in plaintext.
+- `name` is required at signup (max 100 chars); `name` is nullable at the DB level so
+  existing rows created before this field existed still load (the UI falls back to
+  showing the email when `name` is absent).
 - `token` is a JWT; `JWT_EXPIRATION_DAYS` env var controls lifetime (default 7).
 - All `/api/habits/**` endpoints require `Authorization: Bearer <token>`.
 
@@ -71,7 +74,7 @@ Monday-start):
 
 ## Data model
 
-- `User(id, email unique, passwordHash, createdAt)`
+- `User(id, email unique, passwordHash, name?, createdAt)`
 - `Habit(id, name, description?, active, createdAt, owner -> User, category?,
   frequencyType?, targetPerPeriod?)` — `category`/`frequencyType`/`targetPerPeriod`
   are nullable columns; `null` frequencyType means `DAILY`, `null` targetPerPeriod

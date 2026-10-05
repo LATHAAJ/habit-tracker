@@ -2,7 +2,7 @@ import { useAuth } from '../AuthContext.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 
 export default function TopBar({ tab, onTabChange }) {
-  const { email, logout } = useAuth();
+  const { email, name, logout } = useAuth();
 
   return (
     <header className="topbar">
@@ -30,7 +30,7 @@ export default function TopBar({ tab, onTabChange }) {
 
       <div className="user-chip">
         <ThemeToggle />
-        <span className="user-email">{email}</span>
+        <span className="user-email">{name || email}</span>
         <button type="button" className="btn btn-ghost" onClick={logout}>
           Log out
         </button>
