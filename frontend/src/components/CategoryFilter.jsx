@@ -1,3 +1,5 @@
+import { categoryColor } from '../categories.js';
+
 export default function CategoryFilter({ categories, selected, onSelect }) {
   if (categories.length === 0) return null;
 
@@ -15,6 +17,7 @@ export default function CategoryFilter({ categories, selected, onSelect }) {
           key={category}
           type="button"
           className={`chip ${selected === category ? 'active' : ''}`}
+          data-color={categoryColor(category)}
           onClick={() => onSelect(category)}
         >
           {category}

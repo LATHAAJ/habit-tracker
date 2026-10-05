@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
+import { categoryColor } from '../categories.js';
 import Heatmap from './Heatmap.jsx';
 
 function frequencyLabel(habit) {
@@ -12,6 +13,7 @@ function frequencyLabel(habit) {
 export default function HabitCard({ habit, onChanged, onDeleted }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState('');
+  const [celebrate, setCelebrate] = useState(false);
 
   async function handleToggle() {
     setError('');
@@ -19,6 +21,10 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
       const updated = await api(`/api/habits/${habit.id}/toggle`, { method: 'POST' });
       setRefreshKey((k) => k + 1);
       onChanged(updated);
+      if (!habit.completedToday && updated.completedToday) {
+        setCelebrate(true);
+        setTimeout(() => setCelebrate(false), 700);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -35,12 +41,16 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
   }
 
   return (
-    <article className="habit-card">
+    <article className={`habit-card ${habit.currentStreak > 0 ? 'on-streak' : ''}`}>
       <div className="habit-card-header">
         <div>
           <h3 className="habit-name">{habit.name}</h3>
           <div className="habit-tags">
-            {habit.category && <span className="tag">{habit.category}</span>}
+            {habit.category && (
+              <span className="tag" data-color={categoryColor(habit.category)}>
+                {habit.category}
+              </span>
+            )}
             <span className="tag tag-muted">{frequencyLabel(habit)}</span>
           </div>
         </div>
@@ -52,7 +62,7 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
       {habit.description && <p className="habit-description">{habit.description}</p>}
 
       <div className="streak-row">
-        <div className="streak-badge current">
+        <div className={`streak-badge current ${habit.currentStreak > 0 ? 'glowing' : ''}`}>
           <span className="streak-flame">🔥</span>
           <span className="streak-number">{habit.currentStreak}</span>
           <span className="streak-label">current</span>
@@ -68,13 +78,20 @@ export default function HabitCard({ habit, onChanged, onDeleted }) {
 
       {error && <p className="form-error">{error}</p>}
 
-      <button
-        type="button"
-        className={`btn btn-toggle ${habit.completedToday ? 'done' : ''}`}
-        onClick={handleToggle}
-      >
-        {habit.completedToday ? 'Done today ✓' : 'Mark today done'}
-      </button>
+      <div className="toggle-wrap">
+        <button
+          type="button"
+          className={`btn btn-toggle ${habit.completedToday ? 'done' : ''}`}
+          onClick={handleToggle}
+        >
+          {habit.completedToday ? 'Done today ✓' : 'Mark today done'}
+        </button>
+        {celebrate && (
+          <span className="celebration" aria-hidden="true">
+            🎉
+          </span>
+        )}
+      </div>
     </article>
   );
 }

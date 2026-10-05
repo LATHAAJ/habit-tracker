@@ -67,8 +67,8 @@ export default function AddHabitForm({ onCreated }) {
           <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
             <option value="">No category</option>
             {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
+              <option key={c.value} value={c.value}>
+                {c.value}
               </option>
             ))}
           </select>
