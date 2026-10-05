@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import AddHabitForm from './AddHabitForm.jsx';
-import AiHabitPlanner from './AiHabitPlanner.jsx';
 import CategoryFilter from './CategoryFilter.jsx';
 import DashboardSummary from './DashboardSummary.jsx';
 import HabitCard from './HabitCard.jsx';
@@ -53,8 +52,6 @@ export default function Dashboard() {
       <DashboardSummary habits={habits} />
 
       <AddHabitForm onCreated={loadHabits} />
-
-      <AiHabitPlanner onCreated={loadHabits} />
 
       <CategoryFilter categories={categories} selected={selectedCategory} onSelect={setSelectedCategory} />
 

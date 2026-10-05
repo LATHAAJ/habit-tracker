@@ -1,7 +1,5 @@
 package com.habittracker.config;
 
-import com.habittracker.ai.AiGenerationException;
-import com.habittracker.ai.AiUnavailableException;
 import com.habittracker.auth.EmailAlreadyInUseException;
 import com.habittracker.auth.InvalidCredentialsException;
 import com.habittracker.habit.HabitNotFoundException;
@@ -43,16 +41,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidStatsRangeException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidStatsRange(InvalidStatsRangeException ex) {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    @ExceptionHandler(AiUnavailableException.class)
-    public ResponseEntity<Map<String, Object>> handleAiUnavailable(AiUnavailableException ex) {
-        return error(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
-    }
-
-    @ExceptionHandler(AiGenerationException.class)
-    public ResponseEntity<Map<String, Object>> handleAiGeneration(AiGenerationException ex) {
-        return error(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

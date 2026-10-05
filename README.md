@@ -66,30 +66,7 @@ from signup/login.
 | GET    | `/api/habits/{id}/logs?from=&to=` | Completed dates in a range (ISO strings) |
 | GET    | `/api/stats/trend?granularity=&periods=` | Weekly/monthly completion-rate trend |
 | GET    | `/api/stats/habits?from=&to=`  | Habits ranked by completion rate, best first |
-| POST   | `/api/ai/habit-plan`           | `{goal}` → AI-suggested habit plan (see below) |
 | GET    | `/api/health`                  | Unauthenticated health check                 |
-
-## AI habit plan (optional)
-
-The dashboard has a "✨ Generate habit plan with AI" button: type a goal (e.g. "become
-a stronger Java backend developer") and get back a suggested set of habits — some daily,
-some weekly — that you can review and add in one click.
-
-This calls **Google's Gemini API**, not Anthropic's, specifically because Gemini has a
-genuine no-cost free tier (no credit card, doesn't expire) suitable for a low-volume
-personal feature like this.
-
-To enable it:
-
-1. Get a free API key at <https://aistudio.google.com/apikey>.
-2. Set it as the `GEMINI_API_KEY` environment variable (locally, and on Render — see below).
-
-Without a key set, the feature is cleanly disabled (`503` with a clear message) — everything
-else in the app works normally.
-
-`GEMINI_MODEL` (default `gemini-2.0-flash-lite`) is also configurable if Google renames or
-retires that model — check <https://ai.google.dev/gemini-api/docs/models> for current free-tier
-model IDs if the feature starts returning errors.
 
 ## Deploying to Render
 
@@ -110,5 +87,4 @@ This repo includes a `render.yaml` Blueprint that provisions a free web service 
 3. Set these environment variables on the web service:
    - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` — from the Postgres instance
    - `JWT_SECRET` — any long random string (used to sign tokens; keep it secret)
-   - `GEMINI_API_KEY` — optional, enables the AI habit plan feature (see above)
 4. Deploy. Render sets `PORT` automatically; the app reads it via `server.port=${PORT:8080}`.
