@@ -47,7 +47,7 @@ export default function Heatmap({ habitId, refreshKey }) {
   return (
     <div className="heatmap">
       {days.map((day) => (
-        <div key={day.iso} className={`day ${day.filled ? 'filled' : ''}`} title={day.iso} />
+        <div key={day.iso} className={`day ${day.filled ? 'filled' : ''}`} />
       ))}
     </div>
   );
