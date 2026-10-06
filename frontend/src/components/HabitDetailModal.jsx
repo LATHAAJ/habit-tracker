@@ -104,6 +104,7 @@ export default function HabitDetailModal({ habit, onClose }) {
   const avgConsistency = weeks.length > 0 ? weeks.reduce((sum, w) => sum + w.rate, 0) / weeks.length : null;
   const rating = avgConsistency !== null ? getRating(avgConsistency) : null;
   const totalDays = weeks.reduce((sum, w) => sum + w.count, 0);
+  const currentWeekRate = currentWeek ? rateOf(currentWeek.count, currentWeek.target) : null;
 
   function handleOverlayClick(e) {
     e.stopPropagation();
@@ -137,8 +138,19 @@ export default function HabitDetailModal({ habit, onClose }) {
                   </span>
                 </div>
               </div>
+            ) : currentWeek ? (
+              <div className="consistency-summary" data-color="blue">
+                <span className="consistency-emoji">📅</span>
+                <div>
+                  <span className="consistency-label">This week</span>
+                  <span className="consistency-value">
+                    {currentWeek.count}/{currentWeek.target} days completed so far ·{' '}
+                    {Math.round(currentWeekRate * 100)}% of goal
+                  </span>
+                </div>
+              </div>
             ) : (
-              <p className="stats-empty">Not enough history yet — check back after a full week.</p>
+              <p className="stats-empty">No data yet.</p>
             )}
 
             {currentWeek && (
